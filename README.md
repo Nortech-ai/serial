@@ -1,4 +1,4 @@
-# serial [![Build Status](https://travis-ci.org/goburrow/serial.svg?branch=master)](https://travis-ci.org/goburrow/serial) [![GoDoc](https://godoc.org/github.com/goburrow/serial?status.svg)](https://godoc.org/github.com/goburrow/serial)
+# serial [![Build Status](https://travis-ci.org/Nortech-ai/serial.svg?branch=master)](https://travis-ci.org/Nortech-ai/serial) [![GoDoc](https://godoc.org/github.com/Nortech-ai/serial?status.svg)](https://godoc.org/github.com/Nortech-ai/serial)
 ## Example
 ```go
 package main
@@ -6,7 +6,7 @@ package main
 import (
 	"log"
 
-	"github.com/goburrow/serial"
+	"github.com/Nortech-ai/serial"
 )
 
 func main() {
