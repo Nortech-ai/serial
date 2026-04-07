@@ -1,3 +1,4 @@
+//go:build darwin || linux || freebsd || openbsd || netbsd
 // +build darwin linux freebsd openbsd netbsd
 
 package serial
@@ -10,6 +11,8 @@ import (
 	"syscall"
 	"time"
 	"unsafe"
+
+	"golang.org/x/sys/unix"
 )
 
 // port implements Port interface.
@@ -67,6 +70,12 @@ func (p *port) Open(c *Config) (err error) {
 		p.Close()
 		return err
 	}
+
+	if err = updateModemConfig(p.fd, &c.Modem); err != nil {
+		p.Close()
+		return err
+	}
+
 	p.timeout = c.Timeout
 	return
 }
@@ -262,4 +271,34 @@ func enableRS485(fd int, config *RS485Config) error {
 		return errors.New("serial: unknown error from SYS_IOCTL (RS485)")
 	}
 	return nil
+}
+
+// Updates the modem config according to the settings
+func updateModemConfig(fd int, config *ModemConfig) error {
+	if config.DTR == PinConfigurationIgnored && config.RTS == PinConfigurationIgnored {
+		return nil
+	}
+
+	modemConfig, err := getModemConfig(fd)
+	if err != nil {
+		return err
+	}
+
+	if config.DTR != PinConfigurationIgnored {
+		if config.DTR == PinConfigurationEnabled {
+			modemConfig |= unix.TIOCM_DTR
+		} else {
+			modemConfig &= ^unix.TIOCM_DTR
+		}
+	}
+
+	if config.RTS != PinConfigurationIgnored {
+		if config.RTS == PinConfigurationEnabled {
+			modemConfig |= unix.TIOCM_RTS
+		} else {
+			modemConfig &= ^unix.TIOCM_RTS
+		}
+	}
+
+	return setModemConfig(fd, modemConfig)
 }
